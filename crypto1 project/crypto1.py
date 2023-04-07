@@ -12,14 +12,18 @@ import os
 print("Running...")
 
 my_digest_str = 'some-nonsene-key-thing-idk'
-encoded_digest = my_digest_str.encode()
+encoded_digest = my_digest_str.encode("ascii","ignore")
 
 
 
 
 print("Exclude '<Drive>:\\' to use current directory instead of direct reference")
 directory1_input = input("Directory1 (input folder): ")
+if not directory1_input:
+	directory1_input = "input"
 directory2_output = input("Directory2 (output folder): ")
+if not directory2_output:
+	directory2_output = "output"
 
 print("")
 
@@ -47,7 +51,7 @@ def filename4hash(vstr_filename):
 	
 	tmsg = file.read()
 	#tenc = tmsg.encode()
-	dmod = "sha1"
+	dmod = "sha256"
 	
 	d_mak = hmac.new(encoded_digest,msg=tmsg,digestmod=dmod)
 	ret = d_mak.digest()
@@ -68,6 +72,7 @@ def filename4hash(vstr_filename):
 def openNwrite(vstr_filename,vvalue):
 	file = open(vstr_filename,"w+")
 	file.write(vvalue)
+	file.close()
 
 print("\nInput files:")
 for filename in os.listdir(my_input_d):

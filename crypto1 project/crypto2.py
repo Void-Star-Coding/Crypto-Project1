@@ -1,26 +1,30 @@
 import hmac
 import os
-#The first program should take two user inputs as arguments: directory1 and directory2.
-#Your program should compute a hash value (using HMAC) for __each file__ (based on its content) 
-	#in the folder directory1
-#and store that hash value in a new file that will be saved under the folder directory2.
 
-#For example, if you have two files, file1 and file2, in directory1,
-#your program should create two files, say file1-hash and file2-hash that 
-	#store the hash values of the contents of the corresponding two files under directory2.
+#The second program should perform the verification process.  
+#It also takes two input arguments as the first program.  
+#It should generate hashes again 
+	#(you can reuse some code  from  the  first  program  here)  and  
+	#check  whether  they  are  matching  with  the corresponding values 
+	#stored in directory 2.  
+
+#For each file,  this program should output two strings:  
+	#the filename and 
+	#YES/NO (denoting whether the hashes are matching or not)
 
 print("Running...")
 
 my_digest_str = 'some-nonsene-key-thing-idk'
-encoded_digest = my_digest_str.encode()
-
-
+encoded_digest = my_digest_str.encode("ascii","ignore")
 
 
 print("Exclude '<Drive>:\\' to use current directory instead of direct reference")
 directory1_input = input("Directory1 (input folder): ")
+if not directory1_input:
+	directory1_input = "input"
 directory2_output = input("Directory2 (output folder): ")
-
+if not directory2_output:
+	directory2_output = "output"
 print("")
 
 running_directory = os.getcwd()		#current directory
@@ -47,7 +51,7 @@ def filename4hash(vstr_filename):
 	
 	tmsg = file.read()
 	#tenc = tmsg.encode()
-	dmod = "sha1"
+	dmod = "sha256"
 	
 	d_mak = hmac.new(encoded_digest,msg=tmsg,digestmod=dmod)
 	ret = d_mak.digest()
@@ -68,28 +72,43 @@ def filename4hash(vstr_filename):
 def openNwrite(vstr_filename,vvalue):
 	file = open(vstr_filename,"w+")
 	file.write(vvalue)
+	file.close()
+	
+#
+def fileToString(vstr_filename):
+	file = open(vstr_filename,"r")
+	ret = str(file.read())
+	return ret
 
+print("\nComparing hashes...\n")
+#CHANGED FROM C1
 for filename in os.listdir(my_input_d):
 	full_filename = os.path.join(my_input_d, filename)
 	nbytes = filename4hash(full_filename)
 	
 	new_filename = os.path.splitext(filename)[0] + "-hash.txt"
 	newfull_filename = os.path.join(my_output_d,new_filename)
-	print(f"{newfull_filename} --> {nbytes}")
+	#print(f"{newfull_filename} --> {nbytes}")
 	
+	#"og hash"
 	b2str = str(nbytes)
+	'''
+	openNwrite(newfull_filename,b2str)'''	#CHANGED
 	
-	openNwrite(newfull_filename,b2str)
+	#added
+	
+	f2str = fileToString(newfull_filename)
+	#print(f"{newfull_filename}\n{f2str}\n\n")
+	
+	#'''
+	
+	print(f"file:{newfull_filename}\n{b2str}\n{f2str}\n")
+	if f2str.find(b2str) != -1:
+		print('YES - The output and files in the directory are the same')
+	else:
+		print('NO - The output and files in the directory are different')
+	#'''
+	print("\n")
+#removed
 
-dir_path = os.path.join('.', 'output')
-file_list = os.listdir(dir_path)
-
-for file_name in file_list:
-    file_path = os.path.join(dir_path, file_name)
-    with open(file_path, 'r') as f:
-        file_contents = f.read()
-
-if file_contents == nbytes:
-    print('The output and files in the directory are the same')
-else:
-    print('The output and files in the directory are different')
+#moved
